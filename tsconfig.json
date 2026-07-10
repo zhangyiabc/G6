@@ -10,7 +10,7 @@
     "pretty": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "strict": true,
     "target": "ES6",
     "types": ["node", "@types/jest"]
