@@ -7,7 +7,7 @@ order: 0
 
 中文字“图”在大家的传统认知里指的是图画、图像，而图论与可视化中的“图”—— Graph 则有着更精确的定位：主体（objects）与关系（relationships）的组成。它甚至不局限于视觉，主体与关系的数据也可以称为图。
 
-> —— 摘自 [AntV 专栏](https://zhuanlan.zhihu.com/aiux-antv)文章：[Graph Visualization · 知多少 之 《HelloWorld 图可视化](https://zhuanlan.zhihu.com/p/83685690)。
+> —— 摘自 [AntV 专栏](https://zhuanlan.zhihu.com/aiux-antv) 文章：[Graph Visualization · 知多少 之 《HelloWorld 图可视化》](https://zhuanlan.zhihu.com/p/83685690)。
 
 在 G6 中，Graph 对象是图的载体，它包含了图上的所有元素（节点、边等），同时挂载了图的相关操作（如交互监听、元素操作、渲染等）。
 
@@ -91,61 +91,65 @@ const graph = new Graph({
 
 ### 完整的创建和配置示例
 
-```js | ob { pin: false }
-createGraph(
-  {
-    width: 300,
-    height: 200,
-    padding: 30,
-    autoResize: true,
+```js | ob { pin: false, inject: true }
+import { Graph } from '@antv/g6';
 
-    // 视口配置
-    zoom: 0.8,
-    autoFit: 'view',
-    padding: 20,
+const graph = new Graph({
+  container: 'container',
+  width: 300,
+  height: 200,
+  width: 300,
+  height: 200,
+  padding: 30,
+  autoResize: true,
 
-    // 主题配置
-    theme: 'dark',
+  // 视口配置
+  zoom: 0.8,
+  autoFit: 'view',
+  padding: 20,
 
-    // 节点配置
-    node: {
-      style: {
-        fill: '#7FFFD4',
-        stroke: '#5CACEE',
-        lineWidth: 2,
-      },
-    },
+  // 主题配置
+  theme: 'dark',
 
-    // 边配置
-    edge: {
-      style: {
-        stroke: '#A4D3EE',
-        lineWidth: 1.5,
-        endArrow: true,
-      },
-    },
-
-    // 布局配置
-    layout: {
-      type: 'force',
-      preventOverlap: true,
-      linkDistance: 100,
-    },
-
-    // 交互行为
-    behaviors: ['drag-canvas', 'zoom-canvas', 'drag-node'],
-
-    // 初始数据
-    data: {
-      nodes: [
-        { id: 'node1', data: { label: '节点1' } },
-        { id: 'node2', data: { label: '节点2' } },
-      ],
-      edges: [{ source: 'node1', target: 'node2', data: { label: '关系' } }],
+  // 节点配置
+  node: {
+    style: {
+      fill: '#7FFFD4',
+      stroke: '#5CACEE',
+      lineWidth: 2,
     },
   },
-  { width: 300, height: 200 },
-);
+
+  // 边配置
+  edge: {
+    style: {
+      stroke: '#A4D3EE',
+      lineWidth: 1.5,
+      endArrow: true,
+    },
+  },
+
+  // 布局配置
+  layout: {
+    type: 'force',
+    preventOverlap: true,
+    linkDistance: 100,
+  },
+
+  // 交互行为
+  behaviors: ['drag-canvas', 'zoom-canvas', 'drag-element'],
+
+  // 初始数据
+  data: {
+    nodes: [
+      { id: 'node1', data: { label: '节点1' } },
+      { id: 'node2', data: { label: '节点2' } },
+    ],
+    edges: [{ source: 'node1', target: 'node2', data: { label: '关系' } }],
+  },
+});
+
+graph.render();
 ```
 
 ```typescript
@@ -194,7 +198,7 @@ const graph = new Graph({
   },
 
   // 交互行为
-  behaviors: ['drag-canvas', 'zoom-canvas', 'drag-node'],
+  behaviors: ['drag-canvas', 'zoom-canvas', 'drag-element'],
 
   // 初始数据
   data: {

@@ -504,6 +504,40 @@ export class Graph extends EventEmitter {
   public getData(): Required<GraphData> {
     return this.context.model.getData();
   }
+  /**
+   * <zh/> 判断图中是否存在指定节点
+   * <en/> Determine whether a specified node exists in the graph
+   * @param {ID} id
+   * @returns {boolean}
+   * @remarks <zh/> 判断图中是否存在指定节点,避免在不存在的节点上进行操作
+   * <en/> Determine whether a specified node exists in the graph and avoid operating on non-existent nodes
+   */
+  public hasNode(id: ID): boolean {
+    return this.context.model.hasNode(id);
+  }
+  /**
+   * <zh/> 判断图中是否存在指定边
+   * <en/> Determine whether a specified edge exists in the graph
+   * @param {ID} id
+   * @returns  {boolean}
+   * @remarks <zh/> 判断图中是否存在指定边,避免在不存在的边上进行操作
+   * <en/> Determine whether a specified edge exists in the graph and avoid operating on non-existent edges
+   */
+  public hasEdge(id: ID): boolean {
+    return this.context.model.hasEdge(id);
+  }
+
+  /**
+   * <zh/> 判断图中是否存在指定组合
+   * <en/> Determine whether a specified combo exists in the graph
+   * @param {ID} id
+   * @returns  {boolean}
+   * @remarks <zh/> 判断图中是否存在指定组合,避免在不存在的组合上进行操作
+   * <en/> Determine whether a specified combo exists in the graph and avoid operating on non-existent combos
+   */
+  public hasCombo(id: ID): boolean {
+    return this.context.model.hasCombo(id);
+  }
 
   /**
    * <zh/> 获取单个元素数据
@@ -1133,7 +1167,13 @@ export class Graph extends EventEmitter {
     // Wait for synchronous tasks to complete, to avoid problems caused by calling destroy immediately after render
     await Promise.resolve();
 
-    if (this.destroyed) throw new Error(format('The graph instance has been destroyed'));
+    if (this.destroyed) {
+      // 如果图实例已经被销毁，则不再执行任何操作
+      // If the graph instance has been destroyed, no further operations will be performed
+      // eslint-disable-next-line no-console
+      console.error(format('The graph instance has been destroyed'));
+      return;
+    }
 
     await this.initCanvas();
     this.initRuntime();
@@ -1833,13 +1873,24 @@ export class Graph extends EventEmitter {
     if (isCollapsed(model.getNodeLikeData([id])[0])) return;
     if (this.isCollapsingExpanding) return;
 
-    if (typeof options === 'boolean') options = { animation: options, align: true };
+    if (typeof options === 'boolean') options = { animation: options, align: false };
 
     const elementType = model.getElementType(id);
 
     await this.frontElement(id);
     this.isCollapsingExpanding = true;
-    this.setElementCollapsibility(id, true);
+
+    // 更新折叠状态 / Update collapse style
+    model.updateData(
+      elementType === 'node'
+        ? {
+            nodes: [{ id, style: { collapsed: true } }],
+          }
+        : {
+            combos: [{ id, style: { collapsed: true } }],
+          },
+    );
+
     if (elementType === 'node') await element!.collapseNode(id, options);
     else if (elementType === 'combo') await element!.collapseCombo(id, !!options.animation);
 
@@ -1860,12 +1911,23 @@ export class Graph extends EventEmitter {
     if (!isCollapsed(model.getNodeLikeData([id])[0])) return;
     if (this.isCollapsingExpanding) return;
 
-    if (typeof options === 'boolean') options = { animation: options, align: true };
+    if (typeof options === 'boolean') options = { animation: options, align: false };
 
     const elementType = model.getElementType(id);
 
     this.isCollapsingExpanding = true;
-    this.setElementCollapsibility(id, false);
+
+    // 更新折叠状态 / Update collapse style
+    model.updateData(
+      elementType === 'node'
+        ? {
+            nodes: [{ id, style: { collapsed: false } }],
+          }
+        : {
+            combos: [{ id, style: { collapsed: false } }],
+          },
+    );
+
     if (elementType === 'node') await element!.expandNode(id, options);
     else if (elementType === 'combo') await element!.expandCombo(id, !!options.animation);
 

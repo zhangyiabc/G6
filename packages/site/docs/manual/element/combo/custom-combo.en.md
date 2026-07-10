@@ -1,9 +1,9 @@
 ---
 title: Custom Combo
-order: 3
+order: 4
 ---
 
-G6 provides two types of [built-in combos](/en/manual/element/combo/build-in/base-combo): circular combos and rectangular combos. However, in complex business scenarios, you may need to create custom combos with specific styles, interactive effects, or behavior logic.
+G6 provides two types of [built-in combos](/en/manual/element/combo/base-combo): circular combos and rectangular combos. However, in complex business scenarios, you may need to create custom combos with specific styles, interactive effects, or behavior logic.
 
 ## Before You Start: Understanding the Basic Composition of Combos
 
@@ -42,6 +42,10 @@ This is the most common way, and you can choose to inherit one of the following 
 - 📌 **Fast Development**: Suitable for most project needs, quickly achieving business goals.
 - 📌 **Easy Maintenance**: Clear code structure and clear inheritance relationships.
 
+:::tip{title=Get Started Now}
+If you choose to inherit from existing combo types (recommended), you can jump directly to [Create Your First Custom Combo in Three Steps](#create-your-first-custom-combo-in-three-steps) to start practicing. Most users will choose this approach!
+:::
+
 ### 2. Develop from Scratch Based on the G Graphics System <Badge>Advanced Usage</Badge>
 
 If existing combo types do not meet your needs, you can create combos from scratch based on the underlying graphics system of G.
@@ -56,157 +60,152 @@ If existing combo types do not meet your needs, you can create combos from scrat
 Developing custom combos from scratch requires handling all details yourself, including graphic drawing, event response, state changes, expand/collapse logic, etc., which is quite challenging. You can directly refer to the [source code](https://github.com/antvis/G6/blob/v5/packages/g6/src/elements/combos/base-combo.ts) for implementation.
 :::
 
-## Three Steps to Create Your First Custom Combo
+## Create Your First Custom Combo in Three Steps
 
 Let's start by inheriting `BaseCombo` to implement a custom hexagon combo:
 
-```js | ob {pin:false}
-(() => {
-  const { Graph, register, BaseCombo, ExtensionCategory } = g6;
+```js | ob { pin:false, inject: true }
+import { Graph, register, BaseCombo, ExtensionCategory } from '@antv/g6';
 
-  // Define the path for the collapsed state button
-  const collapse = (x, y, r) => {
-    return [
-      ['M', x - r, y],
-      ['a', r, r, 0, 1, 0, r * 2, 0],
-      ['a', r, r, 0, 1, 0, -r * 2, 0],
-      ['M', x - r + 4, y],
-      ['L', x + r - 4, y],
-    ];
-  };
+// Define the path for the collapsed state button
+const collapse = (x, y, r) => {
+  return [
+    ['M', x - r, y],
+    ['a', r, r, 0, 1, 0, r * 2, 0],
+    ['a', r, r, 0, 1, 0, -r * 2, 0],
+    ['M', x - r + 4, y],
+    ['L', x + r - 4, y],
+  ];
+};
 
-  // Define the path for the expanded state button
-  const expand = (x, y, r) => {
-    return [
-      ['M', x - r, y],
-      ['a', r, r, 0, 1, 0, r * 2, 0],
-      ['a', r, r, 0, 1, 0, -r * 2, 0],
-      ['M', x - r + 4, y],
-      ['L', x - r + 2 * r - 4, y],
-      ['M', x - r + r, y - r + 4],
-      ['L', x, y + r - 4],
-    ];
-  };
+// Define the path for the expanded state button
+const expand = (x, y, r) => {
+  return [
+    ['M', x - r, y],
+    ['a', r, r, 0, 1, 0, r * 2, 0],
+    ['a', r, r, 0, 1, 0, -r * 2, 0],
+    ['M', x - r + 4, y],
+    ['L', x - r + 2 * r - 4, y],
+    ['M', x - r + r, y - r + 4],
+    ['L', x, y + r - 4],
+  ];
+};
 
-  class HexagonCombo extends BaseCombo {
-    // Get the path of the hexagon
-    getKeyPath(attributes) {
-      const [width, height] = this.getKeySize(attributes);
-      const padding = 10;
-      const size = Math.min(width, height) + padding;
+class HexagonCombo extends BaseCombo {
+  // Get the path of the hexagon
+  getKeyPath(attributes) {
+    const [width, height] = this.getKeySize(attributes);
+    const padding = 10;
+    const size = Math.min(width, height) + padding;
 
-      // Calculate the vertices of the hexagon
-      const points = [];
-      for (let i = 0; i < 6; i++) {
-        const angle = (Math.PI / 3) * i;
-        const x = (size / 2) * Math.cos(angle);
-        const y = (size / 2) * Math.sin(angle);
-        points.push([x, y]);
-      }
-
-      // Construct the SVG path
-      const path = [['M', points[0][0], points[0][1]]];
-      for (let i = 1; i < 6; i++) {
-        path.push(['L', points[i][0], points[i][1]]);
-      }
-      path.push(['Z']);
-
-      return path;
+    // Calculate the vertices of the hexagon
+    const points = [];
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i;
+      const x = (size / 2) * Math.cos(angle);
+      const y = (size / 2) * Math.sin(angle);
+      points.push([x, y]);
     }
 
-    // Get the style of the main graphic
-    getKeyStyle(attributes) {
-      const style = super.getKeyStyle(attributes);
-
-      return {
-        ...style,
-        d: this.getKeyPath(attributes),
-        fill: attributes.collapsed ? '#FF9900' : '#F04864',
-        fillOpacity: attributes.collapsed ? 0.5 : 0.2,
-        stroke: '#54BECC',
-        lineWidth: 2,
-      };
+    // Construct the SVG path
+    const path = [['M', points[0][0], points[0][1]]];
+    for (let i = 1; i < 6; i++) {
+      path.push(['L', points[i][0], points[i][1]]);
     }
+    path.push(['Z']);
 
-    // Draw the main graphic
-    drawKeyShape(attributes, container) {
-      return this.upsert('key', 'path', this.getKeyStyle(attributes), container);
-    }
-
-    // Draw the expand/collapse button, using paths for finer control
-    drawCollapseButton(attributes) {
-      const { collapsed } = attributes;
-      const [width] = this.getKeySize(attributes);
-      const btnR = 8;
-      const x = width / 2 + btnR;
-      const d = collapsed ? expand(x, 0, btnR) : collapse(x, 0, btnR);
-
-      // Create the clickable area and button graphic
-      const hitArea = this.upsert('hit-area', 'circle', { cx: x, r: 8, fill: '#fff', cursor: 'pointer' }, this);
-      this.upsert('button', 'path', { stroke: '#54BECC', d, cursor: 'pointer', lineWidth: 1.4 }, hitArea);
-    }
-
-    // Override the render method to add more custom graphics
-    render(attributes, container) {
-      super.render(attributes, container);
-      this.drawCollapseButton(attributes, container);
-    }
-
-    // Use lifecycle hooks to add event listeners
-    onCreate() {
-      this.shapeMap['hit-area'].addEventListener('click', () => {
-        const id = this.id;
-        const collapsed = !this.attributes.collapsed;
-        const { graph } = this.context;
-        if (collapsed) graph.collapseElement(id);
-        else graph.expandElement(id);
-      });
-    }
+    return path;
   }
 
-  // Register the custom combo
-  register(ExtensionCategory.COMBO, 'hexagon-combo', HexagonCombo);
+  // Get the style of the main graphic
+  getKeyStyle(attributes) {
+    const style = super.getKeyStyle(attributes);
 
-  // Create a graph instance and use the custom combo
-  const container = createContainer({ height: 250 });
+    return {
+      ...style,
+      d: this.getKeyPath(attributes),
+      fill: attributes.collapsed ? '#FF9900' : '#F04864',
+      fillOpacity: attributes.collapsed ? 0.5 : 0.2,
+      stroke: '#54BECC',
+      lineWidth: 2,
+    };
+  }
 
-  const graph = new Graph({
-    container,
-    data: {
-      nodes: [
-        { id: 'node1', combo: 'combo1', style: { x: 100, y: 100 } },
-        { id: 'node2', combo: 'combo1', style: { x: 150, y: 150 } },
-        { id: 'node3', combo: 'combo2', style: { x: 300, y: 100 } },
-        { id: 'node4', combo: 'combo2', style: { x: 350, y: 150 } },
-      ],
-      combos: [
-        { id: 'combo1', data: { label: 'Hexagon 1' } },
-        { id: 'combo2', data: { label: 'Hexagon 2' }, style: { collapsed: true } },
-      ],
+  // Draw the main graphic
+  drawKeyShape(attributes, container) {
+    return this.upsert('key', 'path', this.getKeyStyle(attributes), container);
+  }
+
+  // Draw the expand/collapse button, using paths for finer control
+  drawCollapseButton(attributes) {
+    const { collapsed } = attributes;
+    const [width] = this.getKeySize(attributes);
+    const btnR = 8;
+    const x = width / 2 + btnR;
+    const d = collapsed ? expand(x, 0, btnR) : collapse(x, 0, btnR);
+
+    // Create the clickable area and button graphic
+    const hitArea = this.upsert('hit-area', 'circle', { cx: x, r: 8, fill: '#fff', cursor: 'pointer' }, this);
+    this.upsert('button', 'path', { stroke: '#54BECC', d, cursor: 'pointer', lineWidth: 1.4 }, hitArea);
+  }
+
+  // Override the render method to add more custom graphics
+  render(attributes, container) {
+    super.render(attributes, container);
+    this.drawCollapseButton(attributes, container);
+  }
+
+  // Use lifecycle hooks to add event listeners
+  onCreate() {
+    this.shapeMap['hit-area'].addEventListener('click', () => {
+      const id = this.id;
+      const collapsed = !this.attributes.collapsed;
+      const { graph } = this.context;
+      if (collapsed) graph.collapseElement(id);
+      else graph.expandElement(id);
+    });
+  }
+}
+
+// Register the custom combo
+register(ExtensionCategory.COMBO, 'hexagon-combo', HexagonCombo);
+
+// Create a graph instance and use the custom combo
+const graph = new Graph({
+  container: 'container',
+  height: 250,
+  data: {
+    nodes: [
+      { id: 'node1', combo: 'combo1', style: { x: 100, y: 100 } },
+      { id: 'node2', combo: 'combo1', style: { x: 150, y: 150 } },
+      { id: 'node3', combo: 'combo2', style: { x: 300, y: 100 } },
+      { id: 'node4', combo: 'combo2', style: { x: 350, y: 150 } },
+    ],
+    combos: [
+      { id: 'combo1', data: { label: 'Hexagon 1' } },
+      { id: 'combo2', data: { label: 'Hexagon 2' }, style: { collapsed: true } },
+    ],
+  },
+  node: {
+    style: {
+      fill: '#91d5ff',
+      stroke: '#1890ff',
+      lineWidth: 1,
     },
-    node: {
-      style: {
-        fill: '#91d5ff',
-        stroke: '#1890ff',
-        lineWidth: 1,
-      },
+  },
+  combo: {
+    type: 'hexagon-combo',
+    style: {
+      padding: 20,
+      showCollapseButton: true,
+      labelText: (d) => d.data?.label,
+      labelPlacement: 'top',
     },
-    combo: {
-      type: 'hexagon-combo',
-      style: {
-        padding: 20,
-        showCollapseButton: true,
-        labelText: (d) => d.data?.label,
-        labelPlacement: 'top',
-      },
-    },
-    behaviors: ['drag-element'],
-  });
+  },
+  behaviors: ['drag-element'],
+});
 
-  graph.render();
-
-  return container;
-})();
+graph.render();
 ```
 
 ### Step 1: Write the Custom Combo Class

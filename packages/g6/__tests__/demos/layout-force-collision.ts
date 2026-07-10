@@ -40,16 +40,18 @@ export const layoutForceCollision: TestCase = async (context) => {
       velocityDecay: 0.1,
       x: {
         strength: 0.01,
+        x: width / 2,
       },
       y: {
         strength: 0.01,
+        y: width / 2,
       },
+      nodeSize: (d: { data: { r: number } }) => (d.data.r as number) * 2,
       collide: {
-        radius: (d) => d.data.r,
         iterations: 3,
       },
       manyBody: {
-        strength: (d, i) => (i ? 0 : (-width * 2) / 3),
+        strength: (d: any, i: number) => (i ? 0 : (-width * 2) / 3),
       },
       link: false,
     },
@@ -84,8 +86,10 @@ function getData(width: number, size = 200) {
 function randomUniform(min: number, max: number) {
   min = min == null ? 0 : +min;
   max = max == null ? 1 : +max;
-  if (arguments.length === 1) (max = min), (min = 0);
-  else max -= min;
+  if (arguments.length === 1) {
+    max = min;
+    min = 0;
+  } else max -= min;
   return function () {
     return Math.random() * max + min;
   };

@@ -25,6 +25,9 @@ export default defineConfig({
         en: 'G6 is a graph visualization framework with simplicity and convenience. Based on the ability of customization, it provides elegant graph visualization solutions, helping developers build applications for graph visualization, analysis, and editing.',
       },
     },
+    ai: {
+      recommend: 'https://assets.antv.antgroup.com/g6/recommend.json',
+    },
     defaultLanguage: 'zh', // 默认语言
     isAntVSite: false, // 是否是 AntV 的大官网
     siteUrl: homepage, // 官网地址
@@ -41,10 +44,6 @@ export default defineConfig({
     showAPIDoc: false, // 是否在 demo 页展示API文档
     feedback: true, // 是否显示反馈组件
     links: true, // 是否显示links答疑小蜜
-    petercat: {
-      show: true,
-      token: '4bd33b46-9b3c-4df1-be17-9206ea7c7e34',
-    },
     prefersColor: {
       default: 'light',
       switch: false,
@@ -149,14 +148,6 @@ export default defineConfig({
         order: 3,
       },
       {
-        slug: 'manual/element/node/build-in',
-        title: {
-          zh: '内置节点',
-          en: 'Build-in Node',
-        },
-        order: 2,
-      },
-      {
         slug: 'manual/element/edge',
         title: {
           zh: '边 Edge',
@@ -165,28 +156,12 @@ export default defineConfig({
         order: 4,
       },
       {
-        slug: 'manual/element/edge/build-in',
-        title: {
-          zh: '内置边',
-          en: 'Build-in Edge',
-        },
-        order: 2,
-      },
-      {
         slug: 'manual/element/combo',
         title: {
           zh: '组合 Combo',
           en: 'Combo',
         },
         order: 5,
-      },
-      {
-        slug: 'manual/element/combo/build-in',
-        title: {
-          zh: '内置组合',
-          en: 'Build-in Combo',
-        },
-        order: 2,
       },
       {
         slug: 'manual/element/shape',
@@ -205,28 +180,12 @@ export default defineConfig({
         order: 5,
       },
       {
-        slug: 'manual/layout/build-in',
-        title: {
-          zh: '内置布局',
-          en: 'Build-in Layout',
-        },
-        order: 2,
-      },
-      {
         slug: 'manual/behavior',
         title: {
           zh: '交互 Behavior',
           en: 'Behavior',
         },
         order: 6,
-      },
-      {
-        slug: 'manual/behavior/build-in',
-        title: {
-          zh: '内置交互',
-          en: 'Build-in Behavior',
-        },
-        order: 2,
       },
       {
         slug: 'manual/plugin',
@@ -237,28 +196,12 @@ export default defineConfig({
         order: 7,
       },
       {
-        slug: 'manual/plugin/build-in',
-        title: {
-          zh: '内置插件',
-          en: 'Build-in Plugin',
-        },
-        order: 2,
-      },
-      {
         slug: 'manual/transform',
         title: {
           zh: '数据处理 Transform',
           en: 'Transform',
         },
         order: 8,
-      },
-      {
-        slug: 'manual/transform/build-in',
-        title: {
-          zh: '内置数据处理',
-          en: 'Build-in Transform',
-        },
-        order: 2,
       },
       {
         slug: 'manual/theme',
@@ -383,13 +326,13 @@ export default defineConfig({
     /** 公告 */
     announcement: {
       title: {
-        zh: 'AntV OSCP 文档季火热进行中！成为 Issue Hunter，赢限定周边 & 超市卡等好礼 🎁',
-        en: 'AntV OSCP Doc Season: Hunt Issues to Win Exclusive Merch & Gift Cards! 🎁',
+        zh: 'AntV 首个声明式信息图渲染框架正式开源，让数据叙事更简单、更优雅、更高效，现诚邀体验共建！',
+        en: "AntV's declarative infographic framework is now open source. Simpler, more elegant data storytelling!",
       },
       link: {
-        url: 'https://github.com/orgs/antvis/projects/31',
+        url: 'https://infographic.antv.vision/',
         text: {
-          zh: '点击了解活动',
+          zh: '点击了解详情',
           en: 'Learn More',
         },
       },
